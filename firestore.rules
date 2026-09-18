@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAllowedStaff() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['qnpfr7@gmail.com'];
+    }
+    match /programs/{programId} { allow read, write: if isAllowedStaff(); }
+    match /tasks/{taskId} { allow read, write: if isAllowedStaff(); }
+  }
+}
