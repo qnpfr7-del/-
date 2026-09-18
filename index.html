@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>청년 프로그램 일정관리</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">Y</div>
+        <div>
+          <strong>청년 프로그램</strong>
+          <span>일정관리 도구</span>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav-btn active" data-view="dashboard">대시보드</button>
+        <button class="nav-btn" data-view="programs">프로그램 관리</button>
+        <button class="nav-btn" data-view="calendar">월간 캘린더</button>
+        <button class="nav-btn" data-view="gantt">간트 보기</button>
+        <button class="nav-btn" data-view="tasks">오늘 할 일</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <small>Firebase Firestore 기반</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">대시보드</h1>
+          <p id="todayText"></p>
+        </div>
+        <div class="topbar-actions">
+          <div id="userBox" class="user-box hidden"><span id="userEmail"></span><button class="ghost compact" id="logoutBtn">로그아웃</button></div>
+          <button class="primary" id="openCreateBtn">+ 프로그램 등록</button>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view active">
+        <div class="stat-grid" id="statGrid"></div>
+        <div class="two-col">
+          <section class="panel">
+            <div class="panel-head"><h2>다가오는 일정</h2><span class="muted">30일 이내</span></div>
+            <div id="upcomingList" class="list"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>오늘 할 일</h2><span class="muted" id="todayTaskCount"></span></div>
+            <div id="todayTaskList" class="list"></div>
+          </section>
+        </div>
+        <section class="panel">
+          <div class="panel-head"><h2>프로그램 진행 현황</h2></div>
+          <div id="programCards" class="program-grid"></div>
+        </section>
+      </section>
+
+      <section id="view-programs" class="view">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>프로그램 목록</h2>
+            <input id="programSearch" class="search" placeholder="사업명, 담당자 검색">
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>사업명</th><th>모집기간</th><th>선정안내</th><th>운영일</th><th>모집현황</th><th>상태</th><th>담당자</th><th>관리</th></tr></thead>
+              <tbody id="programTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-calendar" class="view">
+        <section class="panel">
+          <div class="calendar-toolbar">
+            <button class="ghost" id="prevMonthBtn">‹</button><h2 id="calendarTitle"></h2><button class="ghost" id="nextMonthBtn">›</button>
+          </div>
+          <div class="calendar-legend">
+            <span><i class="dot recruit"></i>모집</span><span><i class="dot select"></i>선정안내</span><span><i class="dot operate"></i>운영</span><span><i class="dot report"></i>결과보고</span>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </section>
+      </section>
+
+      <section id="view-gantt" class="view">
+        <section class="panel">
+          <div class="calendar-toolbar">
+            <button class="ghost" id="prevGanttMonthBtn">‹</button><h2 id="ganttTitle"></h2><button class="ghost" id="nextGanttMonthBtn">›</button>
+          </div>
+          <div id="ganttWrap" class="gantt-wrap"></div>
+        </section>
+      </section>
+
+      <section id="view-tasks" class="view">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>업무 체크리스트</h2>
+            <div class="task-filter">
+              <button class="chip active" data-task-filter="today">오늘</button><button class="chip" data-task-filter="week">7일</button><button class="chip" data-task-filter="all">전체</button>
+            </div>
+          </div>
+          <div id="taskList" class="list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-head"><h2 id="modalTitle">프로그램 등록</h2><button class="icon-btn" id="closeModalBtn">×</button></div>
+      <form id="programForm">
+        <input type="hidden" id="programId">
+        <div class="form-grid">
+          <label class="span-2">사업명<input id="name" required placeholder="예: 청년 취업역량 강화 특강"></label>
+          <label>담당자<input id="manager" placeholder="예: 홍길동"></label>
+          <label>장소<input id="location" placeholder="예: 청년센터 프로그램실"></label>
+          <label>모집 시작<input id="recruitStart" type="date"></label>
+          <label>모집 종료<input id="recruitEnd" type="date"></label>
+          <label>선정 안내<input id="selectionDate" type="date"></label>
+          <label>운영 시작<input id="operationStart" type="date"></label>
+          <label>운영 종료<input id="operationEnd" type="date"></label>
+          <label>결과보고 기한<input id="reportDue" type="date"></label>
+          <label>모집인원<input id="capacity" type="number" min="0" value="0"></label>
+          <label>신청인원<input id="applicants" type="number" min="0" value="0"></label>
+          <label>상태
+            <select id="status">
+              <option>기획중</option><option>모집중</option><option>선정중</option><option>운영대기</option>
+              <option>운영중</option><option>운영완료</option><option>결과정리</option><option>완료</option>
+            </select>
+          </label>
+          <label class="span-2">메모<textarea id="memo" rows="4" placeholder="특이사항, 강사 관련 내용, 준비물 등을 기록하세요."></textarea></label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="danger ghost" id="deleteProgramBtn">삭제</button><div class="grow"></div>
+          <button type="button" class="ghost" id="cancelBtn">취소</button><button type="submit" class="primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="loading" class="loading hidden">불러오는 중...</div>
+  <div id="toast" class="toast hidden"></div>
+  <div id="authGate" class="auth-gate">
+    <div class="auth-card">
+      <div class="brand-mark">Y</div>
+      <h2>청년 프로그램 일정관리</h2>
+      <p>승인된 Google 계정으로 로그인해 주세요.</p>
+      <button class="primary auth-button" id="loginBtn">Google 계정으로 로그인</button>
+      <p id="authMessage" class="auth-message"></p>
+    </div>
+  </div>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
