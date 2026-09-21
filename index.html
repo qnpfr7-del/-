@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>청년 프로그램 일정관리</title>
-  <link rel="stylesheet" href="style.css?v=20260921-2">
+  <link rel="stylesheet" href="style.css?v=20260921-3">
 </head>
 <body>
   <div class="app-shell">
@@ -21,7 +21,6 @@
         <button class="nav-btn active" data-view="dashboard">대시보드</button>
         <button class="nav-btn" data-view="programs">프로그램 관리</button>
         <button class="nav-btn" data-view="calendar">월간 캘린더</button>
-        <button class="nav-btn" data-view="gantt">간트 보기</button>
         <button class="nav-btn" data-view="tasks">오늘 할 일</button>
       </nav>
 
@@ -87,15 +86,6 @@
         </section>
       </section>
 
-      <section id="view-gantt" class="view">
-        <section class="panel">
-          <div class="calendar-toolbar">
-            <button class="ghost" id="prevGanttMonthBtn">‹</button><h2 id="ganttTitle"></h2><button class="ghost" id="nextGanttMonthBtn">›</button>
-          </div>
-          <div id="ganttWrap" class="gantt-wrap"></div>
-        </section>
-      </section>
-
       <section id="view-tasks" class="view">
         <section class="panel">
           <div class="panel-head">
@@ -154,6 +144,6 @@
       <p id="authMessage" class="auth-message"></p>
     </div>
   </div>
-  <script type="module" src="script.js"></script>
+  <script type="module" src="script.js?v=20260921-3"></script>
 </body>
 </html>
