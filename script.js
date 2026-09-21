@@ -20,7 +20,6 @@ let state = {
   tasks: [],
   today: '',
   calendarDate: new Date(),
-  ganttDate: new Date(),
   taskFilter: 'today'
 };
 
@@ -68,15 +67,6 @@ function bindEvents() {
     renderCalendar();
   });
 
-  document.getElementById('prevGanttMonthBtn').addEventListener('click', () => {
-    state.ganttDate.setMonth(state.ganttDate.getMonth() - 1);
-    renderGantt();
-  });
-  document.getElementById('nextGanttMonthBtn').addEventListener('click', () => {
-    state.ganttDate.setMonth(state.ganttDate.getMonth() + 1);
-    renderGantt();
-  });
-
   document.querySelectorAll('[data-task-filter]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('[data-task-filter]').forEach(x => x.classList.remove('active'));
@@ -95,7 +85,6 @@ async function loadData() {
     state.tasks = taskSnap.docs.map(x => ({id:x.id, ...x.data()}));
     state.today = toISO(new Date());
     state.calendarDate = parseDate(state.today);
-    state.ganttDate = parseDate(state.today);
     renderAll();
   } catch (err) { handleError(err); }
   finally { setLoading(false); }
@@ -106,7 +95,6 @@ function renderAll() {
   renderDashboard();
   renderProgramTable();
   renderCalendar();
-  renderGantt();
   renderTasks();
 }
 
@@ -205,31 +193,6 @@ function renderCalendar() {
       </div>`;
   }
   document.getElementById('calendarGrid').innerHTML = html;
-}
-
-function renderGantt() {
-  const y = state.ganttDate.getFullYear();
-  const m = state.ganttDate.getMonth();
-  const days = new Date(y,m+1,0).getDate();
-  document.getElementById('ganttTitle').textContent = `${y}년 ${m+1}월`;
-
-  const cols = `180px repeat(${days}, 30px)`;
-  let html = `<div class="gantt-grid" style="grid-template-columns:${cols}">`;
-  html += `<div class="gantt-cell gantt-name">프로그램</div>`;
-  for(let d=1; d<=days; d++) html += `<div class="gantt-cell gantt-day">${d}</div>`;
-
-  state.programs.forEach(p => {
-    html += `<div class="gantt-cell gantt-name">${esc(p.name)}</div>`;
-    for(let d=1; d<=days; d++){
-      const ds = toISO(new Date(y,m,d));
-      let bar = '';
-      if(inRange(ds,p.recruitStart,p.recruitEnd)) bar = '<span class="gantt-bar recruit"></span>';
-      if(inRange(ds,p.operationStart,p.operationEnd)) bar = '<span class="gantt-bar operate"></span>';
-      html += `<div class="gantt-cell">${bar}</div>`;
-    }
-  });
-  html += `</div>`;
-  document.getElementById('ganttWrap').innerHTML = state.programs.length ? html : empty('등록된 프로그램이 없습니다.');
 }
 
 function renderTasks() {
